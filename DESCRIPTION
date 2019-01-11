@@ -12,8 +12,4 @@ Imports:data.table
 Depends:
 Suggests:
 RoxygenNote: 6.1.1
-Export: chain_shipment()
-,chain_resources()
-,chain_extvend()
-,chain_products()
-,chain_sites()
+Export: chain_shipment(),chain_resources(),chain_extvend(),chain_products(),chain_sites()
