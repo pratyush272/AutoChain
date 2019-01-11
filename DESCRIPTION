@@ -8,7 +8,12 @@ Description: This is a collection of analytics solution using R.
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-Imports:
+Imports:data.table
 Depends:
 Suggests:
 RoxygenNote: 6.1.1
+Export: chain_shipment()
+,chain_resources()
+,chain_extvend()
+,chain_products()
+,chain_sites()
