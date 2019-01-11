@@ -62,8 +62,8 @@ chain_sites<- function()
 ####
 #
 ####
-a<- chain_shipment()
-b<- chain_resources()
-c<- chain_extvend()
-d<- chain_products()
-e<- chain_sites()
+# a<- chain_shipment()
+# b<- chain_resources()
+# c<- chain_extvend()
+# d<- chain_products()
+# e<- chain_sites()
