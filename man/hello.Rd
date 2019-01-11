@@ -1,12 +1,17 @@
-\name{hello}
-\alias{hello}
-\title{Hello, World!}
+\name{ps272}
+\alias{ps272}
+\title{Print iris dataset}
 \usage{
-hello()
+ps272()
+}
+\arguments{
+}
+\value{
+None
 }
 \description{
-Prints 'Hello, world!'.
+Prints
 }
 \examples{
-hello()
+ps272()
 }

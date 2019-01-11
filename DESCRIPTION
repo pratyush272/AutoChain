@@ -1,11 +1,14 @@
-Package: aq
+Package: AutoChain
 Type: Package
-Title: What the Package Does (Title Case)
-Version: 0.1.0
-Author: Who wrote it
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
-License: What license is it under?
+Title: Assortment of Supply Chain Analytics Solutions
+Version: 0.1.1
+Author: Pratyush & Raushan
+Maintainer: Pratyush Srivastava <mail@pratyush.info>
+Description: This is a collection of analytics solution using R.
+License: GPL-2
 Encoding: UTF-8
 LazyData: true
+Imports:
+Depends:
+Suggests:
+RoxygenNote: 6.1.1
