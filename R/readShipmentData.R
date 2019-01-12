@@ -1,15 +1,24 @@
+library(data.table)
+library(shiny)
+
+chain_control_panel<- function()
+{
+  runApp("./R/shiny/tst1/")
+}
 
 chain_shipment<- function()
 {
-  shpdata<- data.table(read.csv(file.choose()))
-  delv_plt_col<- menu(colnames(shpdata), title="Which is the Delv Plt column?")
-  material_col<- menu(colnames(shpdata), title="Which is the material column?")
-  ship_to_col<- menu(colnames(shpdata), title="Which is the ship_to column?")
-  qty_col<- menu(colnames(shpdata), title="Which is the Qty column?")
+  # shpdata<- data.table(read.csv(file.choose()))
+  # delv_plt_col<- menu(colnames(shpdata), title="Which is the Delv Plt column?")
+  # material_col<- menu(colnames(shpdata), title="Which is the material column?")
+  # ship_to_col<- menu(colnames(shpdata), title="Which is the ship_to column?")
+  # qty_col<- menu(colnames(shpdata), title="Which is the Qty column?")
+  # 
+  # tmp<- data.table(shpdata[,..delv_plt_col],shpdata[,..material_col],shpdata[,..ship_to_col],shpdata[,..qty_col])
+  # colnames(tmp)<- c("Delv_plt","Material","Ship_to","Qty")
+  # return(tmp)
   
-  tmp<- data.table(shpdata[,..delv_plt_col],shpdata[,..material_col],shpdata[,..ship_to_col],shpdata[,..qty_col])
-  colnames(tmp)<- c("Delv_plt","Material","Ship_to","Qty")
-  return(tmp)
+  runApp("./R/shiny/tst1/")
 }
 
 chain_resources<- function()
@@ -56,8 +65,8 @@ chain_sites<- function()
 }
 
 
-
-
+rm(tmp)
+chain_control_panel()
 
 ####
 #
