@@ -96,6 +96,7 @@ server <- function(input, output, session) {
     
     df <- data.frame(read.csv(input$file1$datapath, header = input$header, sep = input$sep, quote = input$quote))[c(input$a,input$b,input$c,input$d)]
     colnames(df)<- tmp
+    dir.create("files", showWarnings = FALSE)
     write.csv(df,file="./files/chain_shipmentfile.csv",row.names = F)
     return(head(read.csv("./files/chain_shipmentfile.csv")))
     
