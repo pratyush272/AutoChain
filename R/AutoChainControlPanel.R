@@ -1,6 +1,7 @@
 chain_control_panel<- function(){
 
 library(shiny)
+library(shinyjs)
 Sys.setlocale('LC_ALL','C')
 
 tmp<- c("delv_plt","material","ship_to","qty")
