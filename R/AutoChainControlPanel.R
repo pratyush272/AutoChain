@@ -2,6 +2,10 @@ chain_control_panel<- function(){
 
 library(shiny)
 library(shinyjs)
+library(qcc)
+library(dplyr)
+library(data.table)
+  
 Sys.setlocale('LC_ALL','C')
 
 tmp<- c("delv_plt","material","ship_to","qty")
@@ -40,14 +44,23 @@ ui <- fluidPage(
                    tableOutput("summary_table")
                  )#mainpanel
                )#layout
-             )
+             )#TabPage
     ),
-    tabPanel("<Raushan to add Pareto"),
+    tabPanel("Shipment Pareto",
+             fluidPage(
+               sidebarLayout(
+                 sidebarPanel(
+                   sliderInput("obs","top %age of customers:",min = 1,max = 100,value = 10)),
+                 mainPanel(
+                   plotOutput("distPlot")
+                 )
+               )
+             )),
     "Header B",
     tabPanel("Component 3"),
     tabPanel("Component 4")
     ,widths = c(2,8))
-)#page
+)#ConrolPanelPage
   
 
 server <- function(input, output, session) {
@@ -83,6 +96,7 @@ server <- function(input, output, session) {
     df <- data.frame(read.csv(input$file1$datapath, header = input$header, sep = input$sep, quote = input$quote))[c(input$a,input$b,input$c,input$d)]
     colnames(df)<- tmp
     dir.create("files", showWarnings = FALSE)
+    if(file.exists("./files/chain_shipmentfile.csv")){file.remove("./files/chain_shipmentfile.csv")}
     write.csv(df,file="./files/chain_shipmentfile.csv",row.names = F)
     return(head(read.csv("./files/chain_shipmentfile.csv")))
     
@@ -92,10 +106,26 @@ server <- function(input, output, session) {
     data()
   })
   
+  output$distPlot <- renderPlot({
+    dist <- rnorm(input$obs)
+    tmp<- data.table(read.csv("./files/chain_shipmentfile.csv"))
+    a<- tmp[,sum(qty),by=(ship_to)]
+    b<- a$V1
+    names(b)<- a$ship_to 
+    b<- head(b[order(-b)],((input$obs)/100)*length(b))
+    pareto.chart((b), ylab = "Customers",cumperc = seq(0, 100, by = 5))
+    
+  })
   
   
   
-}
+}#ServerFunction
 
 shinyApp(ui, server)
 }
+
+#####################################################333
+b<- read.csv("./data/worldcities.csv")
+c<- inner_join(a,b, by = c("ship_to" = "city"))[,c(1,4,5)]
+
+chain_control_panel()
