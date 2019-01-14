@@ -47,21 +47,6 @@ ui <- fluidPage(
     tabPanel("Component 3"),
     tabPanel("Component 4")
     ,widths = c(2,8))
-  #   sidebarLayout(
-  #     sidebarPanel(
-  #       fileInput("file1", "Choose CSV File",multiple = TRUE,accept = c("text/csv",".csv")),
-  #       checkboxInput("header", "Header", TRUE),
-  #       radioButtons("sep", "Separator",choices = c(Comma = ",",Semicolon = ";",Tab = "\t"),selected = ","),
-  #       radioButtons("quote", "Quote",choices = c(None = "","Double Quote" = '"',"Single Quote" = "'"),selected = '"'),
-  #       tableOutput("a"),tableOutput("b"),tableOutput("c"),tableOutput("d")
-  #       ,actionButton("generate","Clean my shipment")
-  #     
-  #       ),#sidepanel
-  #     mainPanel(
-  #       tableOutput("contents"),
-  #       tableOutput("summary_table")
-  #   )#mainpanel
-  # )#layout
 )#page
   
 
