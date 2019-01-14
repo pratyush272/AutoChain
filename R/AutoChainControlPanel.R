@@ -5,6 +5,9 @@ library(shinyjs)
 library(qcc)
 library(dplyr)
 library(data.table)
+library(ggmap)
+library(maps)
+library(mapdata)
   
 Sys.setlocale('LC_ALL','C')
 
@@ -127,5 +130,13 @@ shinyApp(ui, server)
 #####################################################333
 b<- read.csv("./data/worldcities.csv")
 c<- inner_join(a,b, by = c("ship_to" = "city"))[,c(1,4,5)]
+d <- map_data("world2Hires")
+
+ggplot() + 
+  geom_polygon(data = d, aes(x=long, y = lat, group = group), color = "black", fill = NA)+
+  geom_point(data = c, aes(x=lng, y = lat, group = 1), color = "red") + 
+  coord_fixed(1.3)
+
+################################3
 
 chain_control_panel()
