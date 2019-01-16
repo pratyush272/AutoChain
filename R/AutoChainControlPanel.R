@@ -8,6 +8,9 @@ library(data.table)
 library(ggmap)
 library(maps)
 library(mapdata)
+install_github('ramnathv/rCharts@dev')
+install_github("ramnathv/rMaps")
+library(sf)
   
 Sys.setlocale('LC_ALL','C')
 

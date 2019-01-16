@@ -8,8 +8,7 @@ Description: This is a collection of analytics solution using R.
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
-Imports:data.table
-Depends:data.table
+Depends:data.table, Depends: dplyr (>= 0.4.3), ggplot2 (>= 2.1.0), lazyeval (>= 0.1.10)
 Suggests:
 RoxygenNote: 6.1.1
 
