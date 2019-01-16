@@ -1,0 +1,9 @@
+site_id,site_name,site_zip,site_city,site_state,site_country,site_lat,site_long
+101,Bakery_Delhi,110012,Delhi,DL,IN,28.67,77.21
+102,Bakery_Bangalore,560067,Bangalore,KN,IN,12.97,77.56
+103,DC_Lucknow,226003,Lucknow,UP,IN,26.82,80.94
+104,DC_Mumbai,400001,Mumbai,MH,IN,18.96,72.82
+601,Cust_Agra,282001,Agra,UP,IN,27.19,78.01
+602,Cust_Hyderabad,500001,Hyderabad,AP,IN,17.40,78.48
+603,Cust_Godhara,389001,Godhara,GJ,IN,22.77,73.60
+604,Cust_Kolkata,364601,Kolkata,WB,IN,22.57,88.36
