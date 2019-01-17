@@ -29,7 +29,7 @@ chain_site_master <- function(file )
   return(chain_clean_file(file,headers))
 }
 
-chain_prod_master <- function(file )
+chain_product_master <- function(file )
 {
   headers = c("prod_code","Prod_name","units_per_load")
   return(chain_clean_file(file,headers))
@@ -38,6 +38,11 @@ chain_prod_master <- function(file )
 chain_eord <- function(file )
 {
   headers = c("product","from_location","to_location")
+  return(chain_clean_file(file,headers))
+}
+chain_production_master <- function(file )
+{
+  headers = c("pp_code","product","production_CPU")
   return(chain_clean_file(file,headers))
 }
 
@@ -86,11 +91,14 @@ chain_data_gaps<- function(shipment,sites,eord,prod_master)
   
 }#end of chain_data_gaps
 
-chain_historical_flows<- function(shipment,eord)
+chain_historical_flows<- function(shipment,eord,sitemaster,productmaster,productionmaster,googleAPIKey)
 {
   library(sqldf)
   library(dplyr)
   library(stringr)
+  library(gmapsdistance)
+  set.api.key(googleAPIKey)
+  library(ggmap)
   
   eord$pass1<- unname(unlist(sqldf("select coalesce(b.to_location,a.to_location) from eord a left join eord b on a.product=b.product and a.to_location=b.from_location")))
   eord$pass2<- unname(unlist(sqldf("select coalesce(b.to_location,a.pass1) from eord a left join eord b on a.product=b.product and a.pass1=b.from_location")))
@@ -196,18 +204,46 @@ chain_historical_flows<- function(shipment,eord)
   shipment[(routeOrder==0)]$step <- "Make"
   shipment[(routeOrder>0)& (destination!=customer_id)]$step <- "IP"
   shipment[(routeOrder>0)& (destination==customer_id)]$step <- "OB"
+  
+  shipment$origin_city<- sqldf("select b.site_city from shipment a left join sitemaster b on a.origin =b.site_id")
+  shipment$destination_city<- sqldf("select b.site_city from shipment a left join sitemaster b on a.destination =b.site_id")
+  
+  results = gmapsdistance(shipment$origin_city, shipment$destination_city, mode = "driving", shape= "long",combinations = "pairwise",key = googleAPIKey)
+  shipment$miles<- results$Distance$Distance/1600
+  
+  shipment<- data.table(sqldf("select a.*,b.units_per_load from shipment a left join productmaster b on a.product_code=b.prod_code"))
+  
+  shipment$cost<- 1.1
+  shipment$units<- as.numeric(shipment$units)
+  shipment[miles<200,]$cost <- shipment[miles<200,]$miles * 3.6 / shipment[miles<200,]$units
+  shipment[miles>200 & miles<500,]$cost <- shipment[miles>200 & miles<500,]$miles * 2.2 /shipment[miles>200 & miles<500,]$units_per_load * shipment[miles>200 & miles<500,]$units
+  shipment[miles>500 & miles<1000,]$cost <- shipment[miles>500 & miles<1000,]$miles * 2.1 /shipment[miles>500 & miles<1000,]$units_per_load *shipment[miles>500 & miles<1000,]$units
+  shipment[miles>1000 & miles<1500,]$cost <- shipment[miles>1000 & miles<1500,]$miles * 1.7 /shipment[miles>1000 & miles<1500,]$units_per_load * shipment[miles>1000 & miles<1500,]$units
+  shipment[miles>1500 & miles<2000,]$cost <- shipment[miles>1500 & miles<2000,]$miles * 1.65 /shipment[miles>1500 & miles<2000,]$units_per_load * shipment[miles>1500 & miles<2000,]$units
+  shipment[miles>2000 & miles<3000,]$cost <- shipment[miles>2000 & miles<3000,]$miles * 1.60 /shipment[miles>2000 & miles<3000,]$units_per_load * shipment[miles>2000 & miles<3000,]$units
+  shipment[miles>3000,]$cost <- shipment$miles * 2.2
+  
+  shipment<- data.table(sqldf("select a.*,b.production_CPU from shipment a left join productionmaster b on a.product_code=b.product and a.origin=b.pp_code"))
+  shipment[routeOrder==0,]$cost<- shipment[routeOrder==0,]$units*shipment[routeOrder==0,]$production_CPU
+  
+  shipment[step!= 'OB']$revenue <- 0
+  
+  return(shipment[,.(routeType ,product_code, origin ,destination ,routeOrder ,customer_id, units   ,revenue, step, miles,       cost)])
   }
 
 
 
-##################### testing
+##################### testing (shipment,eord,sitemaster,productmaster,productionmaster,googleAPIKey
  a<- chain_shipment_data("./R/sampledata/shipment.csv")
  b<- chain_eord("./R/sampledata/eord.csv")
- c<- chain_prod_master("./R/sampledata/prod_master.csv")
+ c<- chain_product_master("./R/sampledata/prod_master.csv")
  d<- chain_site_master("./R/sampledata/sites.csv")
+ e<- chain_production_master("./R/sampledata/production_master.csv")
 chain_shipment_summary(a)
 chain_data_gaps(a,d,b,c)
-chain_historical_flows(a,b)
+chain_historical_flows(a,b,d,c,e,"GOOGLE_API_KEY")
+
+
 
 
 

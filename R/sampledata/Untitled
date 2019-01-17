@@ -1,0 +1,5 @@
+pp_code,product_code,production_CPU
+101,123,0.7
+101,126,0.8
+101,125,0.9
+102,124,1.1
