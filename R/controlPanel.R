@@ -8,32 +8,21 @@ library(data.table)
 library(ggmap)
 library(maps)
 library(mapdata)
-install_github('ramnathv/rCharts@dev')
-install_github("ramnathv/rMaps")
+#install_github('ramnathv/rCharts@dev')
+#install_github("ramnathv/rMaps")
 library(sf)
+  library(rhandsontable)
   
 Sys.setlocale('LC_ALL','C')
 
 tmp<- c("delv_plt","material","ship_to","qty")
 
-jsToggleFS <- 'shinyjs.toggleFullScreen = function() {
-    var element = document.documentElement,
-enterFS = element.requestFullscreen || element.msRequestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen,
-exitFS = document.exitFullscreen || document.msExitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen;
-if (!document.fullscreenElement && !document.msFullscreenElement && !document.mozFullScreenElement && !document.webkitFullscreenElement) {
-enterFS.call(element);
-} else {
-exitFS.call(document);
-}
-}'
-
 ui <- fluidPage(
-  useShinyjs(),
-  extendShinyjs(text = jsToggleFS),
-  titlePanel("AutoChain Control Panel"),
-  navlistPanel(
-    "Shipment Data",
-    tabPanel("Cleanup",
+  titlePanel("AutoChain Control Panel")
+  ,actionButton("cleanall","Clear all Data")
+  ,navlistPanel(
+    "Data Cleaning"
+    ,tabPanel("Shipment",
              fluidPage(
                sidebarLayout(
                  sidebarPanel(
@@ -43,9 +32,11 @@ ui <- fluidPage(
                    radioButtons("quote", "Quote",choices = c(None = "","Double Quote" = '"',"Single Quote" = "'"),selected = '"'),
                    tableOutput("a"),tableOutput("b"),tableOutput("c"),tableOutput("d")
                    ,actionButton("generate","Clean my shipment")
-                   
+                   ,wellPanel(h3("Edit Data"),actionButton("edit", "Open Editor")
+                   )
                    ,width = 3),#sidepanel
                  mainPanel(
+                   rHandsontableOutput("hot"),
                    tableOutput("contents"),
                    tableOutput("summary_table")
                  )#mainpanel
@@ -62,8 +53,35 @@ ui <- fluidPage(
                  )
                )
              )),
-    "Header B",
-    tabPanel("Component 3"),
+    "Editing",
+    tabPanel("Edit Table",
+             fluidPage(
+               sidebarLayout(
+                 sidebarPanel(
+                   helpText("Shiny app based on an example given in the rhandsontable package.", 
+                            "Right-click on the table to delete/insert rows.", 
+                            "Double-click on a cell to edit"),
+                   
+                   wellPanel(
+                     h3("Table options"),
+                     radioButtons("useType", "Use Data Types", c("TRUE", "FALSE"))
+                   ),
+                   br(), 
+                   
+                   wellPanel(
+                     h3("Save"), 
+                     actionButton("save", "Save table")
+                   )        
+                   
+                 ),#sidepanel
+                 mainPanel(
+                   
+                   rHandsontableOutput("hot")
+                   
+                 )#mainpanel
+               )#layout
+             )#TabPage
+    ),
     tabPanel("Component 4")
     ,widths = c(2,8))
 )#ConrolPanelPage
@@ -108,8 +126,42 @@ server <- function(input, output, session) {
     
   })
   
+  
+  observeEvent(input$edit, {
+    editTable(data.frame(read.csv("./files/chain_shipmentfile.csv")))
+  })
+    
+
+  
   output$summary_table <- renderTable({
     data()
+  })
+  
+  values <- reactiveValues()
+  
+  ## Handsontable
+  observe({
+    if (!is.null(input$hot)) {
+      DF = hot_to_r(input$hot)
+    } else {
+      if (is.null(values[["DF"]]))
+        DF <- data.frame(read.csv("./files/chain_shipmentfile.csv"))
+      else
+        DF <- values[["DF"]]
+    }
+    values[["DF"]] <- DF
+  })
+  
+  output$hot <- renderRHandsontable({
+    DF <- values[["DF"]]
+    if (!is.null(DF))
+      rhandsontable(DF, useTypes = as.logical(input$useType), stretchH = "all")
+  })
+  
+  ## Save 
+  observeEvent(input$save, {
+    finalDF <- isolate(values[["DF"]])
+    saveRDS(finalDF, file=file.path(outdir, sprintf("%s.rds", outfilename)))
   })
   
   output$distPlot <- renderPlot({
@@ -129,6 +181,8 @@ server <- function(input, output, session) {
 
 shinyApp(ui, server)
 }
+
+
 
 #####################################################333
 b<- read.csv("./data/worldcities.csv")
