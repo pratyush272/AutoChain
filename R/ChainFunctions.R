@@ -99,6 +99,10 @@ chain_historical_flows<- function(shipment,eord,sitemaster,productmaster,product
   library(gmapsdistance)
   set.api.key(googleAPIKey)
   library(ggmap)
+  require(devtools)
+  require (tidygraph)
+  devtools::install_github("dkahle/ggmap", ref = "tidyup")
+  register_google(googleAPIKey)
   
   eord$pass1<- unname(unlist(sqldf("select coalesce(b.to_location,a.to_location) from eord a left join eord b on a.product=b.product and a.to_location=b.from_location")))
   eord$pass2<- unname(unlist(sqldf("select coalesce(b.to_location,a.pass1) from eord a left join eord b on a.product=b.product and a.pass1=b.from_location")))
@@ -215,6 +219,7 @@ chain_historical_flows<- function(shipment,eord,sitemaster,productmaster,product
   
   shipment$cost<- 1.1
   shipment$units<- as.numeric(shipment$units)
+  shipment$revenue<- as.numeric(shipment$revenue)
   shipment[miles<200,]$cost <- shipment[miles<200,]$miles * 3.6 / shipment[miles<200,]$units
   shipment[miles>200 & miles<500,]$cost <- shipment[miles>200 & miles<500,]$miles * 2.2 /shipment[miles>200 & miles<500,]$units_per_load * shipment[miles>200 & miles<500,]$units
   shipment[miles>500 & miles<1000,]$cost <- shipment[miles>500 & miles<1000,]$miles * 2.1 /shipment[miles>500 & miles<1000,]$units_per_load *shipment[miles>500 & miles<1000,]$units
@@ -241,7 +246,9 @@ chain_historical_flows<- function(shipment,eord,sitemaster,productmaster,product
  e<- chain_production_master("./R/sampledata/production_master.csv")
 chain_shipment_summary(a)
 chain_data_gaps(a,d,b,c)
-chain_historical_flows(a,b,d,c,e,"GOOGLE_API_KEY")
+f<- chain_historical_flows(a,b,d,c,e,"AIzaSyC7NFqamPNohsax2PgRAQ2T5rqr1sdFnxo")
+
+tbl_graph(nodes = )
 
 
 
